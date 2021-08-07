@@ -1,0 +1,23 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def main():
+    a=raw_input()
+    a=raw_input()
+    print(a)
+
+main()
