@@ -1,3 +1,4 @@
+import sys
 
 
 
@@ -7,8 +8,7 @@
 
 
 
-
-def imprimir(dado, arquivo=False):
+def imprimir(dado, arquivo=False, formato='hex'):
     raise NotImplemented
 
 
@@ -17,8 +17,13 @@ def imprimir(dado, arquivo=False):
 
 
 def main():
-    a=raw_input()
-    a=raw_input()
-    print(a)
+    linha = sys.stdin.readline()
+    while linha:
+        print(linha.strip()) #aqui temos cada linha sem o newline para tratar uma por uma
+        linha = sys.stdin.readline()
+        
+        
+   
+   
 
 main()
