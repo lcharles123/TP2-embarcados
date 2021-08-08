@@ -1,8 +1,7 @@
-	   load A0 zero 	; initialize A3 to 0
+
 	   load A1 sentinel  	;initialize A1 to sentinel value -999
 	   load A2 one		; load constant 1 into A2
 	   load A3 zero 	; initialize A3 to 0
-
 Beginning: read A1  		; read num -> A0
 	   subtract A0 A1	; subtract -999
            jmpz A0 FinishUp  	; jump if difference was zero
