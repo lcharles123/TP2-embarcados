@@ -1,15 +1,14 @@
-
 	   load A1 sentinel  	;initialize A1 to sentinel value -999
 	   load A2 one		; load constant 1 into A2
 	   load A3 zero 	; initialize A3 to 0
 Beginning: read A1  		; read num -> A0
 	   subtract A0 A1	; subtract -999
-           jmpz A0 FinishUp  	; jump if difference was zero
+           jmpz A0 FinishUp  	; 10
 	   add A0 A1	 	; add -999 back to restore the number
            push A0 		; push A0 onto the stack
 	   add A3 A2  		; increment the counter
 	   jump Beginning	; go back and read in the next number
-FinishUp:  jmpz A3 done 	; quit if length is 0
+FinishUp:  jmpz A3 done 	; 20
   	   pop A0  		; pop the stack and put it in A0
 	   write A0		; output the next value
 	   subtract A3 A2  	; subtract one from the command in A1

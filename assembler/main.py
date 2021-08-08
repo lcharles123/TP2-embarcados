@@ -1,41 +1,49 @@
 import sys
 
-
-def achar_end(label):
-    return 1
-
-
 #recebe uma tupla com a instrucao + operadores e retorna uma tupla com a linha atual a proxima do codigo de maquina
 # formato das instrucoes:[inst][op1] + [op2]
-
 def traduzir(linha):
     inst = linha[0]
-    #return linha
     op1 = linha[1]
     op2 = linha[2]
     
     linha1 = instrucao[inst] # pega os bits da instrucao
     linha2 = 0
     
+    b = lambda i : format(int(i), '016b') # transforma i sem sinal em binario 16 bits
     
-    if inst in ["load","store","jmpz","jmpn"]: # formato [0,3] [0,127] # [0000_0][00][0 0000_0000]
+    if inst == '.data':
+        h = lambda i : "{:02b}".format(i) # converte um numero para string binaria
+        op1 = int(op1)
+        linha2 = b(int(op2) & 0xffff)[8:16]
+        if op1 == 2: # tamanho do dado
+            linha1 = b(int(op2) & 0xffff)[0:8]
+        elif op1 == 1:
+            linha1 = '00000000' # se o dado possui apenas 1 byte
+        else:
+            print(inst,op1,op2)
+            raise ValueError("Tamanho do dado != 1 ou 2 bytes")
+    elif inst in ["load","store","jmpz","jmpn"]: # formato [0,3] [0,127] # [0000_0][00][0 0000_0000]
         linha1 += reg[op1] + '0' # concatena com end registrador + 0 do end memoria, possivel pois so existem 127 pos na memoria
-        linha2 = '1' #TODO
+        linha2 = b(op2)[8:16]
     elif inst in ["read", "write", "push", "pop", "copytop"]: # formato [0,3] # [0000_0][xx][x xxxx_xx00]
         linha1 += '000' # concat para formar linha1
-        linha2 = '000000'+ reg[op2]
+        linha2 = '000000'+ reg[op1]
     elif inst in ["add", "subtract", "multiply", "divide", "move", "loadi", "storei"]: # formato [0,3] [0,3] # [0000_0][00][x xxxx_xx00]
         linha1 += reg[op1] + '0'
         linha2 = '000000' + reg[op2]
     elif inst in ["jump", "call"]: # formato [0,127] # [0000_0][xx][0 0000_0000]
         linha1 += '000'
-        linha2 = '1' #TODO
+        linha2 = b(op1)[8:16]
     elif inst in ["load_s", "store_s"]: # formato [0,3] [0,255] # [0000_0][00][0 0000_0000]
         linha1 += reg[op1] + '0'
         linha2 = '1' # TODO
     elif inst in ["loadc"]: # formato [0,3] imm(9bits) # [0000_0][00][0 0000_0000]
-        linha1 += reg[op1] + '0'
-        linha2 = '1' # TODO
+        bsinal = '0'
+        if op2 < 0 :
+            bsinal = '1'
+        linha1 += reg[op1] + bsinal # este eh o bit de sinal, caso o imm(9bits) seja < 0
+        linha2 = b(op2)[8:16]
     elif inst in ["return"]: # formato 0x8000 # [xxxx_xxxx][xxxx_xxxx] 
         linha1 += '000'
         linha2 = '00000000' # TODO
@@ -43,11 +51,12 @@ def traduzir(linha):
         linha1 += '000'
         linha2 = '00000000' # TODO
     else:
+        print(linha)
         raise ValueError("Instrucao ilegal")
         
     
     
-    return int(linha1, 2) , linha2 #int(linha2, 2)
+    return int(linha1, 2) , int(linha2, 2)
     return linha1 , linha2 #int(linha2, 2)
 
 
@@ -75,7 +84,8 @@ instrucao = {  # intervalos dos operandos, colocar na segunda linha, [0,3]-> reg
 "loadi": '10100',    # [0,3] [0,3]
 "storei": '10101',   # [0,3] [0,3]
 "copytop": '10110',  # [0,3]
-"d" : '00000'        # default:
+".data": '00000',  # [0,3]
+"x" : '00000'        # caso default: dont care
 }
 
 reg = {
@@ -83,7 +93,7 @@ reg = {
 "A1": '01',
 "A2": '10',
 "A3": '11',
-"d" : '00' # caso default:
+"x" : '00' # caso default: dont care
 }
 
 #  :0100010024DA 
@@ -130,7 +140,7 @@ def main():
     formato = "hex"
     #saida = sys.argv[2]
     saida = "stdout"    
-    linhas = [0] * 127 # linhas do codigo de maquina
+    codMaquina = [0] * 127 # linhas do codigo de maquina
     numLinha = 0 # ennumerar as linhas do codigo para substituir pelos labels
     codigoTratado = []
     refs = {}
@@ -155,37 +165,57 @@ def main():
             #print(linha.strip()) #aqui temos cada linha sem o newline pode ser processada uma a uma
             linha = f.readline()
     
-    #print(refs)
-    for i in codigoTratado:
-        print(i)
     
-    for inst in codigoTratado: # segundo passo: substituir pelos labels
+    for inst in codigoTratado: # segundo passo: substituir os labels pelos enderecos
         if inst[1] in ["load","store","jmpz","jmpn"]:  # se formato inst A0 label
             inst[3] = refs[inst[3]]                 # substitui o label pelo end
         elif inst[1] in ["jump","call"]:
             inst[2] = refs[inst[2]] 
         
-        if inst[1] == '.data':
-            continue #TODO
-        
-        if len(inst) == 2:
-            print(traduzir([inst[1], 'd', 'd']))
-        elif len(inst) == 3:
-            print(traduzir(inst[1:] + ['d']))
-        elif len(inst) == 4:
-            print(traduzir(inst[1:]))
-        else:
-            raise ValueError("Instrucao fora do padrao")
-
     
+    for i in codigoTratado:
+        print(i)
+    print("")
+    
+    for i, inst in enumerate(codigoTratado): # agora basta traduzir as instrucoes 1:1     
+        if len(inst) == 2: # inst tamanho 1
+            #continue
+            print(inst)
+            print(traduzir([inst[1], 'x', 'x']))  
+            l1, l2 = traduzir([inst[1], 'x', 'x'])
+            codMaquina[i] = l1
+            codMaquina[i+1] = l2
+        elif len(inst) == 3: # inst de tamanho 2
+            #continue
+            print(inst)
+            print(traduzir([inst[1], inst[2], 'x']))
+            l1, l2 = traduzir([inst[1], inst[2], 'x'])
+            codMaquina[i] = l1
+            codMaquina[i+1] = l2
+        elif len(inst) == 4: # inst de tamanho 3
+            #continue
+            print(inst)
+            print(traduzir(inst[1:]))
+            l1, l2 = traduzir(inst[1:])
+            codMaquina[i] = l1
+            codMaquina[i+1] = l2
+        else:
+            print(inst)
+            raise ValueError("Instrucao fora do padrao")
+       
+    #exit(0)
+    #h = lambda i : "{:02X}".format(i)[-2:] 
+    for i in codMaquina:
+        print(i)
+    #exit(0)
     print(traduzir(('load','A1','133')))
     print(traduzir(('add', 'A2', 'A3')))
-    print(traduzir(('copytop', 'A2', 'd')))
-
-    exit(0) 
-    linhas = [10,36,12] #cada entrada representa uma linha no arquivo hex/mif
-    linhas += [0] * 127
-    imprimir(linhas)
+    print(traduzir(('copytop', 'A2', 'x')))
+    
+    
+    
+    #codMaquina = [10,36,12] #cada entrada representa uma linha no arquivo hex/mif
+    imprimir(codMaquina)
    
    
 
