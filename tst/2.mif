@@ -1,0 +1,45 @@
+DEPTH = 128;
+WIDTH = 8;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = BIN;
+CONTENT
+BEGIN
+
+00        :  00001000;              -- load A0 init ; contador para o tamanho da pilha, preservar
+01        :  00100100;              -- 
+02        :  00001100;              -- load A2 inc ; incremento
+03        :  00100110;              -- 
+04        :  00001110;              -- load A3 init ; armazena o max valor
+05        :  00100100;              -- 
+06        :  00011000;              -- continuar: read A1
+07        :  00000001;              -- 
+08        :  01101000;              -- push A1
+09        :  00000001;              -- 
+0A        :  01010010;              -- jmpz A1 terminouEntrada
+0B        :  00010000;              -- 
+0C        :  00101000;              -- add A0 A2 ; contador para a referencia na pilha, aponta para top+2
+0D        :  00000010;              -- 
+0E        :  01001000;              -- jump continuar
+0F        :  00000110;              -- 
+10        :  00110000;              -- terminouEntrada: subtract A0 A2 ; percorrer a pilha referenciada por A0
+11        :  00000010;              -- 
+12        :  10100010;              -- load_i A1 A0 ; carrega em A1 a ref na pilha dada por A0
+13        :  00000000;              -- 
+14        :  00110010;              -- subtract A1 A3 ; A1-A3 < 0 -> A1 < A3 -> procurar prox
+15        :  00000011;              -- 
+16        :  01011010;              -- jmpn A1 pilhaVaz ; nao eh menor, testar por pilha vazia
+17        :  00011100;              -- 
+18        :  10100010;              -- load_i A1 A0 ;carregar novamente
+19        :  00000000;              -- 
+1A        :  01100010;              -- move A1 A3 ; novo maximo
+1B        :  00000011;              -- 
+1C        :  01010000;              -- pilhaVaz: jmpz A0 ok ; acaba caso pilha vazia
+1D        :  00100000;              -- 
+1E        :  01001000;              -- jump terminouEntrada
+1F        :  00010000;              -- 
+20        :  00100000;              -- ok: write A3
+21        :  00000011;              -- 
+[22..26]:  00000000;              -- inc: .data 2 2
+27        :  00000010;              -- 
+[28..7F]:  00000000;              -- 
+END;

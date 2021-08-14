@@ -1,10 +1,8 @@
 prog: teste
 
 teste:
-	python3 main.py "../tst/Example.a" Example.hex
+	python3 main.py "../tst/Example.a" 
 
 testes:
-	for i in `seq 1` ; do echo "teste $$i" ; python3 main.py "../tst/$$i.a" || break ; done
+	for i in `seq 1` ; do echo "teste $$i" ; python3 main.py "../tst/teste$$i.a" || break ; done
 
-bins:
-	for i in `seq 1` ; do echo "teste $$i" ; python3 main.py "../tst/$$i.a" "../tst/$$ires"|| break ; done

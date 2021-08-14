@@ -1,0 +1,47 @@
+DEPTH = 128;
+WIDTH = 8;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = BIN;
+CONTENT
+BEGIN
+
+00        :  00011000;              -- read A0 ;A0 ^ A1
+01        :  00000000;              -- 
+02        :  00011000;              -- read A1
+03        :  00000001;              -- 
+04        :  00010000;              -- store A0 par0
+05        :  00101000;              -- 
+06        :  00010010;              -- store A1 par1
+07        :  00101010;              -- 
+08        :  01111000;              -- loop: call mull
+09        :  00010000;              -- 
+0A        :  00001010;              -- load A1 par1
+0B        :  00101010;              -- 
+0C        :  01010010;              -- jmpz A1 terminou
+0D        :  00100010;              -- 
+0E        :  01001000;              -- jump loop
+[0F..10]:  00001000;              -- mull: load A0 par0 ;receber os parametros de pow
+11        :  00101000;              -- 
+12        :  00001010;              -- load A1 par1
+13        :  00101010;              -- 
+14        :  00001100;              -- load A2 res
+15        :  00101100;              -- 
+16        :  00111100;              -- multiply A2 A0
+17        :  00000000;              -- 
+18        :  00010100;              -- store A2 res ; guardar o resultado para o retorno
+19        :  00101100;              -- 
+1A        :  10011000;              -- load_c A0 1 ;reaproveitar reg A0
+1B        :  00000001;              -- 
+1C        :  00110010;              -- subtract A1 A0 ;decrementar o expoente por 1
+1D        :  00000000;              -- 
+1E        :  00010010;              -- store A1 par1 ;armazena-lo
+1F        :  00101010;              -- 
+20        :  10000000;              -- return
+21        :  00000000;              -- 
+22        :  00001000;              -- terminou: load A0 res
+23        :  00101100;              -- 
+24        :  00100000;              -- write A0
+[25..2C]:  00000000;              -- res: .data 2 1 ;resultado final
+2D        :  00000001;              -- 
+[2E..7F]:  00000000;              -- 
+END;

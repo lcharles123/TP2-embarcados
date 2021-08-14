@@ -1,28 +1,21 @@
 ;soma parcial na pilha , ler varios ints ate 0 aparecer
 ;soma parcial comecando pelo primeiro int inserido
-continuar:
-read A0
+continuar: read A0
 push A0
 jmpz A0 terminouEntrada
 jump continuar
-terminouEntrada:
-copytop A1 ;topo da pilha, sera a referencia para parada
+terminouEntrada: copytop A1 ;topo da pilha, sera a referencia para parada
 load_c A0 0 ;contador para carregar os dados da pilha
 load_i A2 A0 ;carregar o primeiro elemento da pilha
-loop:
-
-
-load_s  ; carrega em A1 a ref na pilha dada por A0
+loop: load_i  A1 A0; carrega em A1 a ref na pilha dada por A0
 subtract A1 A3 ; A1-A3 < 0 -> A1 < A3 -> procurar prox
 jmpn A1 pilhaVaz ; nao eh menor, testar por pilha vazia
 load_i A1 A0 ;carregar novamente
 move A1 A3 ; novo maximo
-pilhaVaz:
-jmpz A0 ok ; acaba caso pilha vazia
+pilhaVaz: jmpz A0 ok ; acaba caso pilha vazia
 jump terminouEntrada
 
-ok:
-write A3
+ok: write A3
 stop
 
 guardar: .data 2 0

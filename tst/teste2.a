@@ -2,25 +2,21 @@
 load A0 init ; contador para o tamanho da pilha, preservar
 load A2 inc ; incremento
 load A3 init ; armazena o max valor
-continuar:
-read A1
+continuar: read A1
 push A1
 jmpz A1 terminouEntrada
 add A0 A2  ; contador para a referencia na pilha, aponta para top+2
-jump continuar
-terminouEntrada:
-subtract A0 A2 ; percorrer a pilha referenciada por A0
+jump continuar 
+terminouEntrada: subtract A0 A2 ; percorrer a pilha referenciada por A0
 load_i A1 A0 ; carrega em A1 a ref na pilha dada por A0
 subtract A1 A3 ; A1-A3 < 0 -> A1 < A3 -> procurar prox
 jmpn A1 pilhaVaz ; nao eh menor, testar por pilha vazia
 load_i A1 A0 ;carregar novamente
 move A1 A3 ; novo maximo
-pilhaVaz:
-jmpz A0 ok ; acaba caso pilha vazia
+pilhaVaz: jmpz A0 ok ; acaba caso pilha vazia
 jump terminouEntrada
 
-ok:
-write A3
+ok: write A3
 stop
 
 

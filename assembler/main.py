@@ -76,7 +76,7 @@ def traduzir(linha):
         linha2 = '1' # TODO
     elif inst in ["load_c"]: # formato [0,3] imm(9bits) # [0000_0][00][0 0000_0000]
         bsinal = '0'
-        if op2 < 0 :
+        if int(op2) < 0 :
             bsinal = '1'
         linha1 += reg[op1] + bsinal # este eh o bit de sinal, caso o imm(9bits) seja < 0
         linha2 = b(op2)[8:16]
@@ -151,8 +151,8 @@ def main():
             lin = linha.strip()
             if lin != '':
                 if lin[0] != ';' :
-                    lin = lin.split(";", 1)
-                    #print([str(numLinha)] + lin[0].split()) # aqui temos a linha nao vazia e sem comentarios e com o endereco no programa
+                    lin = lin.split(";", 1) # obtem a primeira parte da linha, sem o comentario
+                    #print( lin[0].split()) # aqui temos a linha nao vazia e sem comentarios e com o endereco no programa
                     linha = lin[0].split()
                     if linha[0] not in instrucao.keys(): # guardar o endereco das referencias em um dict{'label': end} , passo 1
                         refs[linha[0][:-1]] = numLinha
@@ -163,8 +163,10 @@ def main():
                     numLinha += 2 
             #print(linha.strip()) #aqui temos cada linha sem o newline pode ser processada uma a uma
             linha = f.readline()
-    
-    
+    #exit(0)
+    for i in codigoTratado:
+        print(i)
+    #exit(0)
     for inst in codigoTratado: # segundo passo: substituir os labels pelos enderecos
         if inst[1] in ["load","store","jmpz","jmpn"]:  # se formato inst A0 label
             inst[3] = refs[inst[3]]                 # substitui o label pelo end
@@ -202,16 +204,12 @@ def main():
             print(inst)
             raise ValueError("Instrucao fora do padrao")
        
-    #exit(0)
+    exit(0)
     #h = lambda i : "{:02X}".format(i)[-2:] 
     for i in codMaquina:
         print(i)
     #exit(0)
     print(traduzir(('load','A1','133')))
-    print(traduzir(('add', 'A2', 'A3')))
-    print(traduzir(('copytop', 'A2', 'x')))
-    
-    
     
     #codMaquina = [10,36,12] #cada entrada representa uma linha no arquivo hex/mif
     imprimir(codMaquina)

@@ -1,0 +1,55 @@
+DEPTH = 128;
+WIDTH = 8;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = BIN;
+CONTENT
+BEGIN
+
+00        :  00011000;              -- read A0 ;entrada da funcao fatorial, usar <= 7
+01        :  00000000;              -- 
+02        :  01100000;              -- move A0 A2 ;guardar a condicao de parada A0 -> A2
+03        :  00000010;              -- 
+04        :  10011010;              -- load_c A1 0
+05        :  00000000;              -- 
+06        :  00101010;              -- add A1 A0
+07        :  00000000;              -- 
+08        :  01011010;              -- jmpn A1 invalido ;caso seja negativo ou 0
+09        :  00001110;              -- 
+0A        :  01010010;              -- jmpz A1 zero
+0B        :  00010010;              -- 
+0C        :  01001000;              -- jump fat
+0D        :  00010110;              -- 
+0E        :  10011011;              -- invalido: load_c A1-1
+0F        :  11111111;              -- 
+10        :  01001000;              -- jump sai
+11        :  00101100;              -- 
+12        :  10011010;              -- zero: load_c A1 1
+13        :  00000001;              -- 
+14        :  01001000;              -- jump sai
+15        :  00101100;              -- 
+16        :  10011010;              -- fat: load_c A1 1
+17        :  00000001;              -- 
+18        :  01101000;              -- push A0 ; empilha a entrada
+19        :  00000000;              -- 
+1A        :  00110000;              -- subtract A0 A1 ;
+1B        :  00000001;              -- 
+1C        :  00110010;              -- subtract A1 A0
+1D        :  00000000;              -- 
+1E        :  01011010;              -- jmpn A1 fat
+1F        :  00010110;              -- 
+20        :  10011010;              -- load_c A1 1
+21        :  00000001;              -- 
+22        :  01110000;              -- mul: pop A0 ; desempilha e multiplica
+23        :  00000000;              -- 
+24        :  00111010;              -- multiply A1 A0
+25        :  00000000;              -- 
+26        :  00110000;              -- subtract A0 A2 ; sair caso chegou ao ultimo numero
+27        :  00000010;              -- 
+28        :  01010000;              -- jmpz A0 sai
+29        :  00101100;              -- 
+2A        :  01001000;              -- jump mul
+2B        :  00100010;              -- 
+2C        :  00100000;              -- sai: write A1
+2D        :  00000001;              -- 
+[2E..7F]:  00000000;              -- 
+END;

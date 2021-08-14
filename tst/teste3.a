@@ -4,14 +4,12 @@ read A1
 store A0 par0
 store A1 par1
 
-loop:
-call mull
+loop: call mull
 load A1 par1
 jmpz A1 terminou
 jump loop
-
-mull: ;procedimento para multiplicar e salvar nas vars globais
-load A0 par0 ;receber os parametros de pow
+;procedimento para multiplicar e salvar nas vars globais
+mull: load A0 par0 ;receber os parametros de pow
 load A1 par1
 load A2 res
 multiply A2 A0
@@ -21,8 +19,7 @@ subtract A1 A0 ;decrementar o expoente por 1
 store A1 par1 ;armazena-lo
 return
 
-terminou:
-load A0 res
+terminou: load A0 res
 write A0
 stop
 
