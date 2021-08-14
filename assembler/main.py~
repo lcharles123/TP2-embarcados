@@ -1,5 +1,41 @@
 import sys
 
+instrucao = {  # intervalos dos operandos, colocar na segunda linha, [0,3]-> regs [0,127]->mem, 0->nenhum
+"stop": '00000',      # 0
+"load": '00001',      # [0,3] [0,127]
+"store": '00010',     # [0,3] [0,127]
+"read": '00011',      # [0,3]
+"write": '00100',     # [0,3]
+"add": '00101',       # [0,3] [0,3]
+"subtract": '00110',  # [0,3] [0,3]
+"multiply": '00111',  # [0,3] [0,3]
+"divide": '01000',    # [0,3] [0,3]
+"jump": '01001',      # [0,127]
+"jmpz": '01010',     # [0,3] [0,127]
+"jmpn": '01011',     # [0,3] [0,127]
+"move": '01100',     # [0,3] [0,3]
+"push": '01101',     # [0,3]
+"pop": '01110',      # [0,3]
+"call": '01111',     # [0,127]
+"return": '00000',# 0x8000 ??
+"load_s": '10001',   # [0,3] [0,255]
+"store_s": '10010',  # [0,3] [0,255]
+"load_c": '10011',    # [0,3] imm(9bits)
+"loadi": '10100',    # [0,3] [0,3]
+"storei": '10101',   # [0,3] [0,3]
+"copytop": '10110',  # [0,3]
+".data": '00000',  # [0,3]
+"x" : '00000'        # caso default: dont care
+}
+
+reg = {
+"A0": '00',
+"A1": '01',
+"A2": '10',
+"A3": '11',
+"x" : '00' # caso default: dont care
+}
+
 #recebe uma tupla com a instrucao + operadores e retorna uma tupla com a linha atual a proxima do codigo de maquina
 # formato das instrucoes:[inst][op1] + [op2]
 def traduzir(linha):
@@ -38,7 +74,7 @@ def traduzir(linha):
     elif inst in ["load_s", "store_s"]: # formato [0,3] [0,255] # [0000_0][00][0 0000_0000]
         linha1 += reg[op1] + '0'
         linha2 = '1' # TODO
-    elif inst in ["loadc"]: # formato [0,3] imm(9bits) # [0000_0][00][0 0000_0000]
+    elif inst in ["load_c"]: # formato [0,3] imm(9bits) # [0000_0][00][0 0000_0000]
         bsinal = '0'
         if op2 < 0 :
             bsinal = '1'
@@ -58,43 +94,6 @@ def traduzir(linha):
     
     return int(linha1, 2) , int(linha2, 2)
     return linha1 , linha2 #int(linha2, 2)
-
-
-instrucao = {  # intervalos dos operandos, colocar na segunda linha, [0,3]-> regs [0,127]->mem, 0->nenhum
-"stop": '00000',      # 0
-"load": '00001',      # [0,3] [0,127]
-"store": '00010',     # [0,3] [0,127]
-"read": '00011',      # [0,3]
-"write": '00100',     # [0,3]
-"add": '00101',       # [0,3] [0,3]
-"subtract": '00110',  # [0,3] [0,3]
-"multiply": '00111',  # [0,3] [0,3]
-"divide": '01000',    # [0,3] [0,3]
-"jump": '01001',      # [0,127]
-"jmpz": '01010',     # [0,3] [0,127]
-"jmpn": '01011',     # [0,3] [0,127]
-"move": '01100',     # [0,3] [0,3]
-"push": '01101',     # [0,3]
-"pop": '01110',      # [0,3]
-"call": '01111',     # [0,127]
-"return": '00000',# 0x8000 ??
-"load_s": '10001',   # [0,3] [0,255]
-"store_s": '10010',  # [0,3] [0,255]
-"loadc": '10011',    # [0,3] imm(9bits)
-"loadi": '10100',    # [0,3] [0,3]
-"storei": '10101',   # [0,3] [0,3]
-"copytop": '10110',  # [0,3]
-".data": '00000',  # [0,3]
-"x" : '00000'        # caso default: dont care
-}
-
-reg = {
-"A0": '00',
-"A1": '01',
-"A2": '10',
-"A3": '11',
-"x" : '00' # caso default: dont care
-}
 
 #  :0100010024DA 
 #  cada linha = 8 bits (1 byte) == na memoria, duas linhas para formar uma instrucao. int possui 2 bytes = 16 bits
@@ -176,7 +175,7 @@ def main():
     for i in codigoTratado:
         print(i)
     print("")
-    
+    print (refs)
     for i, inst in enumerate(codigoTratado): # agora basta traduzir as instrucoes 1:1     
         if len(inst) == 2: # inst tamanho 1
             #continue
@@ -204,7 +203,7 @@ def main():
             raise ValueError("Instrucao fora do padrao")
        
     #exit(0)
-    h = lambda i : "{:02X}".format(i)[-2:] 
+    #h = lambda i : "{:02X}".format(i)[-2:] 
     for i in codMaquina:
         print(i)
     #exit(0)

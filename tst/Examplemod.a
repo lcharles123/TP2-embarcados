@@ -1,6 +1,10 @@
-	   load A1 sentinel  	;initialize A1 to sentinel value -999
+
+stop
+.data 1 255
+            load A1 sentinel  	;initialize A1 to sentinel value -999
 	   load A2 one		; load constant 1 into A2
 	   load A3 zero 	; initialize A3 to 0
+
 Beginning: read A1  		; read num -> A0
 	   subtract A0 A1	; subtract -999
            jmpz A0 FinishUp  	; 10
@@ -14,6 +18,6 @@ FinishUp:  jmpz A3 done 	; 20
 	   subtract A3 A2  	; subtract one from the command in A1
 	   jump FinishUp	; go back and print out the next number
 done:      stop			; stop
-one:	   .data 2 1 		; constant 1
+one:	   .data 1 255		; constant 1
 zero:	   .data 2 0		; constant 0
 sentinel:  .data 2 -999		; constant -999
