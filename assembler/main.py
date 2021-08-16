@@ -1,6 +1,6 @@
 import sys
 
-instrucao = {  # intervalos dos operandos, colocar na segunda linha, [0,3]-> regs [0,127]->mem, 0->nenhum
+instrucao = {  #  intervalos dos operandos, colocar na segunda linha, [0,3]-> regs [0,127]->mem, 0->nenhum
 "stop": '00000',      # 0
 "load": '00001',      # [0,3] [0,127]
 "store": '00010',     # [0,3] [0,127]
