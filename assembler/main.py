@@ -17,7 +17,7 @@ instrucao = {  # intervalos dos operandos, colocar na segunda linha, [0,3]-> reg
 "push": '01101',     # [0,3]
 "pop": '01110',      # [0,3]
 "call": '01111',     # [0,127]
-"return": '00000',# 0x8000 ??
+"return": '10000',# 0x8000
 "load_s": '10001',   # [0,3] [0,255]
 "store_s": '10010',  # [0,3] [0,255]
 "load_c": '10011',    # [0,3] imm(9bits)
@@ -137,8 +137,7 @@ def main():
         exit(1)
     
     formato = "hex"
-    #saida = sys.argv[2]
-    saida = "stdout"    
+    saida = sys.argv[2]
     codMaquina = [0] * 127 # linhas do codigo de maquina
     numLinha = 0 # ennumerar as linhas do codigo para substituir pelos labels
     codigoTratado = []
@@ -181,30 +180,30 @@ def main():
     for i, inst in enumerate(codigoTratado): # agora basta traduzir as instrucoes 1:1     
         if len(inst) == 2: # inst tamanho 1
             #continue
-            print(inst)
-            print(traduzir([inst[1], 'x', 'x']))  
+            #print(inst)
+            #print(traduzir([inst[1], 'x', 'x']))  
             l1, l2 = traduzir([inst[1], 'x', 'x'])
-            codMaquina[i] = l1
-            codMaquina[i+1] = l2
+            codMaquina[2*i] = l1
+            codMaquina[2*i+1] = l2
         elif len(inst) == 3: # inst de tamanho 2
             #continue
-            print(inst)
-            print(traduzir([inst[1], inst[2], 'x']))
+            #print(inst)
+            #print(traduzir([inst[1], inst[2], 'x']))
             l1, l2 = traduzir([inst[1], inst[2], 'x'])
-            codMaquina[i] = l1
-            codMaquina[i+1] = l2
+            codMaquina[2*i] = l1
+            codMaquina[2*i+1] = l2
         elif len(inst) == 4: # inst de tamanho 3
             #continue
-            print(inst)
-            print(traduzir(inst[1:]))
+            #print(inst)
+            #print(traduzir(inst[1:]))
             l1, l2 = traduzir(inst[1:])
-            codMaquina[i] = l1
-            codMaquina[i+1] = l2
+            codMaquina[2*i] = l1
+            codMaquina[2*i+1] = l2
         else:
             print(inst)
             raise ValueError("Instrucao fora do padrao")
        
-    exit(0)
+    #exit(0)
     #h = lambda i : "{:02X}".format(i)[-2:] 
     for i in codMaquina:
         print(i)
