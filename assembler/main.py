@@ -198,15 +198,16 @@ def main():
         else:
             print(inst)
             raise ValueError("Instrucao fora do padrao")
-       
-    #exit(0)
+    
+    print(codMaquina) 
+    exit(0)
     #h = lambda i : "{:02X}".format(i)[-2:] 
     #for i in codMaquina:
     #    print(i)
     #exit(0)
     
     #codMaquina = [10,36,12] #cada entrada representa uma linha no arquivo hex/mif
-    imprimir(codMaquina)
+    #imprimir(codMaquina, arquivo=saida)
    
    
 

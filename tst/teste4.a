@@ -1,16 +1,23 @@
-;fibonacci
+;imprime a sequencia de fibonacci ate n, dado como entrada
 read A0
-store A0 n
-load_c A1 1 ;contador
-load A2 numA 
 
-fib: write A2
-asdf
+jmpz A0 ok
+load_c A1 1
+load_c A2 0
 
-final: stop
+fib: write A1
+load_c A3 0
+add A3 A1
+add A3 A2
+move A1 A2 ;A1->A2
+move A3 A1
 
-n: .data 2 0 ;deslocamento na pilha
-num: .data 2 0
-numA: .data 2 1
-numB: .data 2 0
+load_c A3 1
+subtract A0 A3
+
+jmpz A0 ok
+jump fib
+
+ok: stop
+
 

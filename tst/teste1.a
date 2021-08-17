@@ -1,24 +1,20 @@
 read A0 ;entrada da funcao fatorial, usar <= 7
-move A0 A2 ;guardar a condicao de parada A0 -> A2
-load_c A1 0
-add A1 A0
-jmpn A1 invalido ;caso seja negativo ou 0
-jmpz A1 zero
-jump fat
-invalido: load_c A1 -1
-jump sai
-zero: load_c A1 1
-jump sai
-fat: load_c A1 1
-push A0             ; empilha a entrada
-subtract A0 A1  ; 
-subtract A1 A0
-jmpn A1 fat
+
 load_c A1 1
-mul: pop A0              ; desempilha e multiplica
-multiply A1 A0
-subtract A0 A2 ; sair caso chegou ao ultimo numero
 jmpz A0 sai
-jump mul
+
+call fat
+jump sai
+
+fat: push A0
+subtract A0 A1
+jmpz A0 ok
+call fat
+
+ok: pop A0
+multiply A1 A0
+return
+
+
 sai:  write A1
 stop
