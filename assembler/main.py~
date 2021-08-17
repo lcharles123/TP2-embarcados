@@ -95,7 +95,7 @@ def imprimir(dados, arquivo='stdout', formato='hex'):
         linhas = []
         for i in range(127):
             linhas.append(':0100' + h(i) + '00' + h(dados[i]) + cks(i,0, dados[i]) )
-        linhas.append(':0100' + h(127) + '01' + '00' + cks(i,1, 0) )
+        linhas.append(':000000' + '01' + 'FF' )
         
         if arquivo == 'stdout':
             for linha in linhas:
@@ -109,6 +109,7 @@ def imprimir(dados, arquivo='stdout', formato='hex'):
         raise NotImplemented('mif')
 
 
+'''Forma de uso: python3 main.py asm_Swombat.a arqsaida'''
 def main():
     argc = len(sys.argv)
     if argc not in [2,3]:
@@ -116,7 +117,6 @@ def main():
             raise ValueError("ERRO: sem arquivos de entrada")
         elif argc > 3:
             raise ValueError("ERRO: excesso de argumentos")
-        '''Forma de uso: python3 main.py asm_Swombat.a arqsaida(.hex)'''
         exit(1)
     
     saida = sys.argv[2]
@@ -144,10 +144,7 @@ def main():
                     numLinha += 2 
             #print(linha.strip()) #aqui temos cada linha sem o newline pode ser processada uma a uma
             linha = f.readline()
-    
-    #for i in codigoTratado:
-    #    print(i)
-    #exit(0)
+            
     for inst in codigoTratado: # segundo passo: substituir os labels pelos enderecos
         if inst[1] in ["load","store","jmpz","jmpn"]:  # se formato inst A0 label
             inst[3] = refs[inst[3]]                 # substitui o label pelo end
@@ -157,23 +154,14 @@ def main():
     
     for i, inst in enumerate(codigoTratado): # agora basta traduzir as instrucoes 1:1     
         if len(inst) == 2: # inst tamanho 1
-            #continue
-            #print(inst)
-            #print(traduzir([inst[1], 'x', 'x']))  
             l1, l2 = traduzir([inst[1], 'x', 'x'])
             codMaquina[2*i] = l1
             codMaquina[2*i+1] = l2
         elif len(inst) == 3: # inst de tamanho 2
-            #continue
-            #print(inst)
-            #print(traduzir([inst[1], inst[2], 'x']))
             l1, l2 = traduzir([inst[1], inst[2], 'x'])
             codMaquina[2*i] = l1
             codMaquina[2*i+1] = l2
         elif len(inst) == 4: # inst de tamanho 3
-            #continue
-            #print(inst)
-            #print(traduzir(inst[1:]))
             l1, l2 = traduzir(inst[1:])
             codMaquina[2*i] = l1
             codMaquina[2*i+1] = l2
@@ -181,16 +169,7 @@ def main():
             print(inst)
             raise ValueError("Instrucao fora do padrao")
     
-    #print(codMaquina) 
-    #exit(0)
-    #h = lambda i : "{:02X}".format(i)[-2:] 
-    #for i in codMaquina:
-    #    print(i)
-    #exit(0)
-    
-    #codMaquina = [10,36,12] #cada entrada representa uma linha no arquivo hex/mif
     imprimir(codMaquina, arquivo=saida)
-   
    
 
 main()

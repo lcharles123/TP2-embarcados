@@ -19,7 +19,6 @@ jump terminouEntrada
 ok: write A3
 stop
 
-
 init: .data 2 0
 inc: .data 2 2
 
