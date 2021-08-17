@@ -54,8 +54,6 @@ def traduzir(linha):
         linha2 = b(int(op2) & 0xffff)[8:16]
         if op1 == 2: # tamanho do dado
             linha1 = b(int(op2) & 0xffff)[0:8]
-        elif op1 == 1:
-            linha1 = '00000000' # se o dado possui apenas 1 byte
         else:
             print(inst,op1,op2)
             raise ValueError("Tamanho do dado != 1 ou 2 bytes")
@@ -118,9 +116,7 @@ def imprimir(dados, arquivo='stdout', formato='hex'):
         else:
             with open(arquivo, 'w') as f:
                 for linha in linhas:
-                    print(linha, file=f, end="")
-                    print("")
-                print("", end="")
+                    print(linha, file=f)
                 
     else:
         raise NotImplemented('mif')
@@ -198,7 +194,8 @@ def main():
         else:
             print(inst)
             raise ValueError("Instrucao fora do padrao")
-       
+    
+    #print(codMaquina) 
     #exit(0)
     #h = lambda i : "{:02X}".format(i)[-2:] 
     #for i in codMaquina:
