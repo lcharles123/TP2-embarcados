@@ -162,9 +162,9 @@ def main():
                     numLinha += 2 
             #print(linha.strip()) #aqui temos cada linha sem o newline pode ser processada uma a uma
             linha = f.readline()
-    #exit(0)
-    for i in codigoTratado:
-        print(i)
+    
+    #for i in codigoTratado:
+    #    print(i)
     #exit(0)
     for inst in codigoTratado: # segundo passo: substituir os labels pelos enderecos
         if inst[1] in ["load","store","jmpz","jmpn"]:  # se formato inst A0 label
@@ -173,10 +173,6 @@ def main():
             inst[2] = refs[inst[2]] 
         
     
-    for i in codigoTratado:
-        print(i)
-    print("")
-    print (refs)
     for i, inst in enumerate(codigoTratado): # agora basta traduzir as instrucoes 1:1     
         if len(inst) == 2: # inst tamanho 1
             #continue
@@ -205,10 +201,9 @@ def main():
        
     #exit(0)
     #h = lambda i : "{:02X}".format(i)[-2:] 
-    for i in codMaquina:
-        print(i)
+    #for i in codMaquina:
+    #    print(i)
     #exit(0)
-    print(traduzir(('load','A1','133')))
     
     #codMaquina = [10,36,12] #cada entrada representa uma linha no arquivo hex/mif
     imprimir(codMaquina)

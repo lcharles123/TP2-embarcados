@@ -1,28 +1,31 @@
 ; ler dois numeros e retornar a potencia de um elevado a outro
 read A0 ;A0 ^ A1
 read A1
-store A0 par0
-store A1 par1
+store A0 base
+store A1 exp
 
-loop: call mull
-load A1 par1
-jmpz A1 terminou
-jump loop
-;procedimento para multiplicar e salvar nas vars globais
-mull: load A0 par0 ;receber os parametros de pow
-load A1 par1
-load A2 res
-multiply A2 A0
-store A2 res; guardar o resultado para o retorno
-load_c A0 1 ;reaproveitar reg A0
-subtract A1 A0 ;decrementar o expoente por 1
-store A1 par1 ;armazena-lo
+jmpz A1 zeroexp
+call mull
+jump final
+
+mull: push A0
+load_c A2 1
+load A1 exp
+subtract A1 A2
+store A1 exp ; sempre empilha A0; call; A0...
+jmpz A1 continua
+call mull ;chamadas recursivas
+continua: load A0 res
+pop A1
+multiply A0 A1
+store A0 res
 return
 
-terminou: load A0 res
+zeroexp: load A0 res
+final: load A0 res
 write A0
 stop
 
-par0: .data 2 0 ;base
-par1: .data 2 0 ; expoente, contador para quantidade multiplicacoes
-res: .data 2 1 ;resultado final
+base: .data 2 0 ;
+exp: .data 2 0 ; expoente, contador para quantidade multiplicacoes
+res: .data 2 1 ; resultado final
