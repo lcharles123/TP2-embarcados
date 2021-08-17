@@ -180,7 +180,7 @@ def main():
         else:
             print(inst)
             raise ValueError("Instrucao fora do padrao")
-    
+     
     #print(codMaquina) 
     #exit(0)
     #h = lambda i : "{:02X}".format(i)[-2:] 
