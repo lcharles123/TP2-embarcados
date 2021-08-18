@@ -133,16 +133,12 @@ def main():
             if lin != '':
                 if lin[0] != ';' :
                     lin = lin.split(";", 1) # obtem a primeira parte da linha, sem o comentario
-                    #print( lin[0].split()) # aqui temos a linha nao vazia e sem comentarios e com o endereco no programa
                     linha = lin[0].split()
                     if linha[0] not in instrucao.keys(): # guardar o endereco das referencias em um dict{'label': end} , passo 1
                         refs[linha[0][:-1]] = numLinha
                         del linha[0] #deletar os labels para deixar apenas instrucoes
-                    
                     codigoTratado.append([str(numLinha)] + linha)
-                    
                     numLinha += 2 
-            #print(linha.strip()) #aqui temos cada linha sem o newline pode ser processada uma a uma
             linha = f.readline()
             
     for inst in codigoTratado: # segundo passo: substituir os labels pelos enderecos

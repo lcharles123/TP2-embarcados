@@ -1,6 +1,6 @@
 import sys
 
-instrucao = {  #  intervalos dos operandos, colocar na segunda linha, [0,3]-> regs [0,127]->mem, 0->nenhum
+instrucao = { 
 "stop": '00000',      # 0
 "load": '00001',      # [0,3] [0,127]
 "store": '00010',     # [0,3] [0,127]
@@ -36,7 +36,7 @@ reg = {
 "x" : '00' # caso default: dont care
 }
 
-'''recebe a instrucao e operadores e retorna 2 elementos: a linha atual a proxima do codigo de maquina'''
+'''Recebe a instrucao e operadores e retorna 2 elementos: a linha atual a proxima do codigo de maquina'''
 def traduzir(linha):
     inst = linha[0]
     op1 = linha[1]
@@ -134,7 +134,7 @@ def main():
                 if lin[0] != ';' :
                     lin = lin.split(";", 1) # obtem a primeira parte da linha, sem o comentario
                     linha = lin[0].split()
-                    if linha[0] not in instrucao.keys(): # guardar o endereco das referencias em um dict{'label': end} , passo 1
+                    if linha[0] not in instrucao.keys(): #guardar o endereco das referencias em um dict{'label': end} , passo 1
                         refs[linha[0][:-1]] = numLinha
                         del linha[0] #deletar os labels para deixar apenas instrucoes
                     codigoTratado.append([str(numLinha)] + linha)
