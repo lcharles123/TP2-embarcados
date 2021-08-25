@@ -1,6 +1,10 @@
 import sys
 
-instrucao = { 
+#inicialmente temos a tabela de simbolos externos vazia, mas sera preenchida na forma endNoCod:(tipo,target) 
+externos = {"tam" : 0, 0 : (None,) }
+
+
+instrucao = {  #  intervalos dos operandos, colocar na segunda linha, [0,3]-> regs [0,127]->mem, 0->nenhum
 "stop": '00000',      # 0
 "load": '00001',      # [0,3] [0,127]
 "store": '00010',     # [0,3] [0,127]
@@ -25,6 +29,12 @@ instrucao = {
 "store_i": '10101',   # [0,3] [0,3]
 "copytop": '10110',   # [0,3]
 ".data": '00000',     # [0,3]
+                                            #tratar isso como instrucoes
+".externD":'ed',   #dado externo
+".externT":'et',   #text externo
+".globalD":'gd',   #dado eh acessivel a outros modulos
+".globalT":'gt',   #procedimento eh acessivel a outros modulos
+
 "x" : '00000'         # caso default: dont care
 }
 
@@ -36,14 +46,20 @@ reg = {
 "x" : '00' # caso default: dont care
 }
 
-'''Recebe a instrucao e operadores e retorna 2 elementos: a linha atual a proxima do codigo de maquina'''
+'''funçao para salvar e carregar a tabela de simbolos para um arquivo'''
+def salvar_dict(arq, dic):
+    f = open(arq,'w')
+    f.write(str(dic))
+    f.close() 
+
+'''recebe a instrucao e operadores e retorna 2 elementos: a linha atual a proxima do codigo de maquina'''
 def traduzir(linha):
     inst = linha[0]
     op1 = linha[1]
     op2 = linha[2]
     
     linha1 = instrucao[inst] # pega os bits da instrucao
-    linha2 = 0
+    linha2 = '00000000'
     
     b = lambda i : format(int(i), '016b') # transforma i sem sinal em binario 16 bits
     
@@ -79,7 +95,14 @@ def traduzir(linha):
         linha2 = b(op2)[8:16]
     elif inst in ["return", "stop"]: # formato 0x8000 # [0000_0][xxx][xxxx_xxxx] 
         linha1 += '000'
-        linha2 = '00000000'
+    elif inst in [".externD", ".externT"]:
+        externos[int(op2)] = (linha1, op1) # externos[endNoCod] = (tipo -> target) 
+        linha1 = '11111111' # esta instrucao diz ao ligador que o simbolo aponta para fora
+        #print(linha1, linha2)
+        #exit(0)
+    elif inst in [".globalD", ".globalT"]: #caso seja elemento externo
+        externos[int(op2)] = (linha1, op1) # externos[endNoCod] = (tipo -> target) 
+        linha1 = '11111111' # esta instrucao diz ao ligador que existe uma referencia externa para essa linha
     else:
         print(linha)
         raise ValueError("Instrucao ilegal")
@@ -100,10 +123,16 @@ def imprimir(dados, arquivo='stdout', formato='hex'):
         if arquivo == 'stdout':
             for linha in linhas:
                 print(linha)
+            print("Simbolos externos")
+            print(externos)
+            
         else:
             with open(arquivo, 'w') as f:
                 for linha in linhas:
                     print(linha, file=f)
+            salvar_dict(arquivo[:-4] + '.sym', externos)
+            print("Simbolos externos")
+            print(externos)
                 
     else:
         raise NotImplemented('mif')
@@ -134,19 +163,27 @@ def main():
                 if lin[0] != ';' :
                     lin = lin.split(";", 1) # obtem a primeira parte da linha, sem o comentario
                     linha = lin[0].split()
-                    if linha[0] not in instrucao.keys(): #guardar o endereco das referencias em um dict{'label': end} , passo 1
+                    if linha[0] not in instrucao.keys(): # guardar o endereco das referencias em um dict{'label': end} , passo 1
                         refs[linha[0][:-1]] = numLinha
                         del linha[0] #deletar os labels para deixar apenas instrucoes
                     codigoTratado.append([str(numLinha)] + linha)
                     numLinha += 2 
             linha = f.readline()
             
-    for inst in codigoTratado: # segundo passo: substituir os labels pelos enderecos
+    for i,inst in enumerate(codigoTratado): # segundo passo: substituir os labels pelos enderecos
         if inst[1] in ["load","store","jmpz","jmpn"]:  # se formato inst A0 label
             inst[3] = refs[inst[3]]                 # substitui o label pelo end
         elif inst[1] in ["jump","call"]:
             inst[2] = refs[inst[2]] 
-        
+        elif inst[1] in [".externD", ".externT", ".globalD", ".globalT"]: #caso o simbolo seja externo, colocar o endereco atual como segundo operando
+            codigoTratado[i].append(inst[0])
+            if i == 0 and inst[1] == ".globalT" and inst[2] == "main": #indicar que é o programa principal
+                externos[0] = ("main",)
+                codigoTratado[0] = [0, "move", "A0", "A0"] # instrução equivalente a nop , para evitar ter que reorganizar os índices das instruções no codigoTratado
+    
+    #for i,inst in enumerate(codigoTratado):
+    #    print(inst)
+    #exit(0)
     
     for i, inst in enumerate(codigoTratado): # agora basta traduzir as instrucoes 1:1     
         if len(inst) == 2: # inst tamanho 1
@@ -165,8 +202,17 @@ def main():
             print(inst)
             raise ValueError("Instrucao fora do padrao")
     
+    codMaquina[2*len(codigoTratado)] = 254 #valor binario == '1111_1110', hex == 'FE' indica final do programa.
+    codMaquina[2*len(codigoTratado)+1] = 254
+
+    externos["tam"] = len(codigoTratado)*2+2 #tamanho do programa + a marcação de final
+    
+    #for i,inst in enumerate(codigoTratado):
+    #    print(inst)
+    
+    #print(refs)
     imprimir(codMaquina, arquivo=saida)
-   
+    #imprimir(codMaquina)
 
 main()
 

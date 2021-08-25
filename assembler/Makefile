@@ -1,30 +1,45 @@
-prog: testes
+prog: t1 t2
 
-teste:
-	python3 main.py "../Example.a" "../ExampleMont.hex"
-	#cat ../ExampleMont.hex
+mod1:
+	python3 main.py "../Example.a" "../Example.hex"
+	#cat ../Example.hex
+	#rm ../Example.hex
 
-testes:
-	@echo "============================================"
-	@echo "Executando todos os testes da pasta tst/ ..."
-	@echo "============================================"
-	for i in `seq 1 4` ; do echo "teste $$i" ; python3 main.py "../tst/teste"$$i".a" "../tst/teste"$$i"Mont.hex" || break ; done
-	@echo "================================================================="
-	@echo "Comparando os arquivos do montador implementado com do CPUsim ..."
-	@echo "================================================================="
-	for i in `seq 1 4` ; do echo "teste $$i" ; diff "../tst/teste"$$i".hex" "../tst/teste"$$i"Mont.hex"  ; done
+mod2:
+	python3 main.py "../Procedimento.a" "../Procedimento.hex"
+	cat ../Procedimento.hex
+
+ligar: 
+	python3 ligador.py "../Example.hex" "../Procedimento.hex" "../ProgramaFinal.hex"
+	#cat ../ProgramaFinal.hex
+	#rm ../ProgramaFinal.hex
+
+t1:	
+	@echo "=========================================="
+	@echo "teste1"
+	python3 main.py "../tst/teste1.a" "../tst/teste1.hex"
+	python3 main.py "../tst/proc.a" "../tst/proc.hex"
+	python3 ligador.py "../tst/teste1.hex" "../tst/proc.hex" "../tst/prog1Final.hex"
+
+t2:
+	@echo "=========================================="
+	@echo "teste2"
+	python3 main.py "../tst/teste2.a" "../tst/teste2.hex"
+	#python3 main.py "../tst/proc.a" "../tst/proc.hex"
+	python3 ligador.py "../tst/teste2.hex" "../tst/proc.hex" "../tst/prog2Final.hex"
+
+
 
 
 clean:
-	rm -rf ../tst/*Mont.hex # removeu apenas os arquivos do montador implementado
+	rm -rf ../tst/*.hex ../tst/*.sym    # removeu todos os arquivos .hex e .sym
 
 help:
 	@echo "================================================================"
-	@echo "Bem vindo ao TP2 de Embarcados"
+	@echo "Bem vindo ao TP3 de Embarcados"
 	@echo "Este makefile contem os seguintes targets:"
-	@echo "\tteste: monta 1 programa"
-	@echo "\ttestes: monta 4 programas"
-	@echo "\tlimpar: limpa os arquivos gerados com o montador implementado"
+	@echo "\t\"\": monta e liga todos os programas"
+	@echo "\tclean: limpa os arquivos gerados por este makefile"
 	@echo "================================================================"
 
-	
+
