@@ -126,7 +126,7 @@ def main():
                 progsCat[volta+1][1] = format(int(p+2), '02X')    #colocar o rótulo dest
 
             else:
-                raise Exception("ERRO: Símbolo não referencia nenhum endereço: \""+ str(rotulo)"\"" )
+                raise Exception("ERRO: Símbolo não referencia nenhum endereço: \""+str(rotulo)+"\"" )
     
     #procurar o marcador de final do programa e remover os FE FE, coloca a instrução stop
     for i in range(len(progsCat[:-1])):

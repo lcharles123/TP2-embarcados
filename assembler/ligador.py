@@ -97,10 +97,17 @@ def main():
         for l,lin in enumerate(prog): #itera entre as linhas de cada prog
             if prog[l][-4:-2] == 'FF' and prog[l+1][-4:-2] == '00':
                 #print(tabelas[p][l],cont, lin)
-                if tabelas[p][l][0] in ['et', 'ed']:
+                if tabelas[p][l][0] == 'et':
                     tabjumps[cont] = tabelas[p][l][1]
-                elif tabelas[p][l][0] in ['gt', 'gd']:
+                elif tabelas[p][l][0] == 'gt':
                     tabjumps[ tabelas[p][l][1] ] = cont
+                else:
+                    raise Exception("ERRO: Símbolo desconhecido.")
+            elif prog[l][-4:-2] == '7F' and prog[l+1][-4:-2] == '00':
+                if tabelas[p][l][0] == 'ed':
+                    raise NotImplemented('.externD')
+                elif tabelas[p][l][0] == 'gd':
+                    raise NotImplemented('.globalD')
                 else:
                     raise Exception("ERRO: Símbolo desconhecido.")
             progsCat[cont].append(cont)
