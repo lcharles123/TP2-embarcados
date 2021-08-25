@@ -29,13 +29,13 @@ instrucao = {  #  intervalos dos operandos, colocar na segunda linha, [0,3]-> re
 "store_i": '10101',   # [0,3] [0,3]
 "copytop": '10110',   # [0,3]
 ".data": '00000',     # [0,3]
-                                            #tratar isso como instrucoes
+
 ".externD":'ed',   #dado externo
 ".externT":'et',   #text externo
-".globalD":'gd',   #dado eh acessivel a outros modulos
-".globalT":'gt',   #procedimento eh acessivel a outros modulos
+".globalD":'gd',   #dado acessivel a outros modulos
+".globalT":'gt',   #procedimento acessivel a outros modulos
 
-"x" : '00000'         # caso default: dont care
+"x" : '00000'      #caso default: dont care
 }
 
 reg = {
@@ -43,7 +43,7 @@ reg = {
 "A1": '01',
 "A2": '10',
 "A3": '11',
-"x" : '00' # caso default: dont care
+"x" : '00' #caso default: dont care
 }
 
 '''funçao para salvar e carregar a tabela de simbolos para um arquivo'''
@@ -73,7 +73,7 @@ def traduzir(linha):
             print(inst,op1,op2)
             raise ValueError("Tamanho do dado != 1 ou 2 bytes")
     elif inst in ["load","store","jmpz","jmpn"]: # formato [0,3] [0,127] # [0000_0][00][0 0000_0000]
-        linha1 += reg[op1] + '0' # concatena com end registrador + 0 do end memoria, possivel pois so existem 127 pos na memoria
+        linha1 += reg[op1] + '0' 
         linha2 = b(op2)[8:16]
     elif inst in ["read", "write", "push", "pop", "copytop"]: # formato [0,3] # [0000_0][xx][x xxxx_xx00]
         linha1 += '000'
@@ -95,21 +95,19 @@ def traduzir(linha):
         linha2 = b(op2)[8:16]
     elif inst in ["return", "stop"]: # formato 0x8000 # [0000_0][xxx][xxxx_xxxx] 
         linha1 += '000'
-    elif inst in [".externD", ".externT"]:
+    elif inst in [".globalT", ".externT"]: #caso seja text
         externos[int(op2)] = (linha1, op1) # externos[endNoCod] = (tipo -> target) 
-        linha1 = '11111111' # esta instrucao diz ao ligador que o simbolo aponta para fora
-        #print(linha1, linha2)
-        #exit(0)
-    elif inst in [".globalD", ".globalT"]: #caso seja elemento externo
-        externos[int(op2)] = (linha1, op1) # externos[endNoCod] = (tipo -> target) 
-        linha1 = '11111111' # esta instrucao diz ao ligador que existe uma referencia externa para essa linha
+        linha1 = '11111111' # esta instrucao diz ao ligador que o simbolo aponta para fora FF 00
+    elif inst in [".globalD", ".externD"]: #caso seja dado
+        externos[int(op2)] = (linha1, op1)  
+        linha1 = '01111111' # equivalente a 7F 00
     else:
         print(linha)
-        raise ValueError("Instrucao ilegal")
+        raise ValueError("Instrucao desconhecida.")
     
     return int(linha1, 2) , int(linha2, 2)
 
-'''Recebe um vetor de ints que serao tradizudos para o codigo de maquina'''
+'''Recebe um vetor de ints que será tradizudo para o codigo de maquina'''
 def imprimir(dados, arquivo='stdout', formato='hex'):
     
     if formato == 'hex':  
@@ -130,15 +128,12 @@ def imprimir(dados, arquivo='stdout', formato='hex'):
             with open(arquivo, 'w') as f:
                 for linha in linhas:
                     print(linha, file=f)
-            salvar_dict(arquivo[:-4] + '.sym', externos)
-            print("Simbolos externos")
-            print(externos)
-                
+            salvar_dict(arquivo[:-4] + '.sym', externos)             
     else:
         raise NotImplemented('mif')
 
 
-'''Forma de uso: python3 main.py asm_Swombat.a arqsaida'''
+'''Função principal'''
 def main():
     argc = len(sys.argv)
     if argc not in [2,3]:
@@ -175,15 +170,11 @@ def main():
             inst[3] = refs[inst[3]]                 # substitui o label pelo end
         elif inst[1] in ["jump","call"]:
             inst[2] = refs[inst[2]] 
-        elif inst[1] in [".externD", ".externT", ".globalD", ".globalT"]: #caso o simbolo seja externo, colocar o endereco atual como segundo operando
+        elif inst[1] in [".externD", ".externT", ".globalD", ".globalT"]: #caso o simbolo seja externo, colocar o rótulo como segundo operando
             codigoTratado[i].append(inst[0])
             if i == 0 and inst[1] == ".globalT" and inst[2] == "main": #indicar que é o programa principal
                 externos[0] = ("main",)
-                codigoTratado[0] = [0, "move", "A0", "A0"] # instrução equivalente a nop , para evitar ter que reorganizar os índices das instruções no codigoTratado
-    
-    #for i,inst in enumerate(codigoTratado):
-    #    print(inst)
-    #exit(0)
+                codigoTratado[0] = [0, "move", "A0", "A0"] # instrução equivalente a nop
     
     for i, inst in enumerate(codigoTratado): # agora basta traduzir as instrucoes 1:1     
         if len(inst) == 2: # inst tamanho 1
@@ -200,17 +191,16 @@ def main():
             codMaquina[2*i+1] = l2
         else:
             print(inst)
-            raise ValueError("Instrucao fora do padrao")
+            raise ValueError("Instrucao desconhecida")
     
     codMaquina[2*len(codigoTratado)] = 254 #valor binario == '1111_1110', hex == 'FE' indica final do programa.
     codMaquina[2*len(codigoTratado)+1] = 254
 
-    externos["tam"] = len(codigoTratado)*2 #tamanho do programa + a marcação de final
+    externos["tam"] = len(codigoTratado)*2+2 #tamanho do programa + a marcação de final
     
-    #for i,inst in enumerate(codigoTratado):
+    #for inst in codigoTratado:
     #    print(inst)
     
-    #print(refs)
     imprimir(codMaquina, arquivo=saida)
     #imprimir(codMaquina)
 

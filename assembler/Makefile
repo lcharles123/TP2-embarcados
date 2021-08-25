@@ -1,4 +1,7 @@
+
+
 prog: t1 t2
+
 
 mod1:
 	python3 main.py "../Example.a" "../Example.hex"
@@ -15,17 +18,19 @@ ligar:
 	#rm ../ProgramaFinal.hex
 
 t1:	
-	@echo "=========================================="
-	@echo "teste1"
+	@echo "==================================================="
+	@echo "teste1: main -> teste1.a , módulo externo -> proc.a"
+	@echo "==================================================="
 	python3 main.py "../tst/teste1.a" "../tst/teste1.hex"
 	python3 main.py "../tst/proc.a" "../tst/proc.hex"
 	python3 ligador.py "../tst/teste1.hex" "../tst/proc.hex" "../tst/prog1Final.hex"
+	@echo ""
 
 t2:
-	@echo "=========================================="
-	@echo "teste2"
+	@echo "================================================================="
+	@echo "teste2: main -> teste2.a , módulo externo -> proc.a pré compilado"
+	@echo "================================================================="
 	python3 main.py "../tst/teste2.a" "../tst/teste2.hex"
-	#python3 main.py "../tst/proc.a" "../tst/proc.hex"
 	python3 ligador.py "../tst/teste2.hex" "../tst/proc.hex" "../tst/prog2Final.hex"
 
 
