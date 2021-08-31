@@ -1,0 +1,14 @@
+.globalT algumacoisa ;função que faz alguma coisa e escreve no console
+push A0
+push A1
+push A2
+load_c A0 1
+load_c A1 2
+load_c A2 3
+add A0 A1
+add A0 A2
+write A0
+pop A2
+pop A1
+pop A0
+

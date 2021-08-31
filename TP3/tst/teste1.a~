@@ -1,0 +1,20 @@
+read A0 ;entrada da funcao fatorial, usar <= 7
+
+load_c A1 1
+jmpz A0 sai
+
+call fat
+jump sai
+
+fat: push A0
+subtract A0 A1
+jmpz A0 ok
+call fat
+
+ok: pop A0
+multiply A1 A0
+return
+
+
+sai:  write A1
+stop

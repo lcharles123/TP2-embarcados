@@ -1,0 +1,10 @@
+.globalT algumacoisa ;função que faz alguma coisa
+push A0
+push A1
+load_c A0 1
+load_c A1 2
+add A0 A1
+write A0
+pop A1
+pop A0
+
